@@ -192,8 +192,11 @@ ORDER BY total_patients_referred DESC;
 ---
 
 ## Tools Used
-- PostgreSQL v15
-- DB Fiddle
+- MySQL
+- MySQL Workbench
+- GitHub
+
+> **Project note:** This project began as a smaller PostgreSQL prototype and was later migrated to MySQL and expanded into a 250-patient dataset for deeper relational and operational analysis.
 
 ## Live Database
 [View the full schema and queries on DB Fiddle](https://www.db-fiddle.com/f/uvEDcwCorkGpLRbBMJjrFN/0)
