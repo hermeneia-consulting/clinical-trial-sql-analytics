@@ -142,9 +142,10 @@ Key concept:
 Basic JOIN + COUNT + GROUP BY.
 */
 SELECT v.vendor_name, 
-	   COUNT(p.patient_id) AS total_patients
+	COUNT(p.patient_id) AS total_patients
 FROM vendors v
-JOIN patients p ON p.vendor_id = v.vendor_id
+	JOIN patients p 
+    ON p.vendor_id = v.vendor_id
 GROUP BY v.vendor_name;
 
 /*
@@ -164,9 +165,10 @@ Using a JOIN relationship to aggregate by another table's attribute.
 */
 
 SELECT s.site_name, 
-       COUNT(p.patient_id) AS total_patients
+	COUNT(p.patient_id) AS total_patients
 FROM patients p
-LEFT JOIN sites s ON s.site_id = p.site_id
+	LEFT JOIN sites s 
+    ON s.site_id = p.site_id
 GROUP BY s.site_name;
 
 /*
@@ -188,7 +190,7 @@ from another table.
 */
 
 SELECT rt.status, 
-COUNT(rt.patient_id) AS number_of_patients
+	(rt.patient_id) AS number_of_patients
 FROM recruitment_tracking rt
 GROUP BY rt.status;
 
@@ -213,13 +215,13 @@ IS NOT NULL tests whether an event/date actually exists.
 
 SELECT p.patient_id, v.vendor_name, s.site_name, rt.roi_signed_date
 FROM recruitment_tracking rt
-JOIN patients p 
-	 ON p.patient_id = rt.patient_id
-JOIN vendors v 
-	 ON v.vendor_id = p.vendor_id
-JOIN sites s 
-     ON s.site_id = p.site_id
-     WHERE roi_signed_date IS NOT NULL;
+	JOIN patients p 
+	ON p.patient_id = rt.patient_id
+	JOIN vendors v 
+    ON v.vendor_id = p.vendor_id
+    JOIN sites s 
+    ON s.site_id = p.site_id
+WHERE roi_signed_date IS NOT NULL;
 
 /*
 Q5 — Patients without signed ROI
@@ -239,12 +241,12 @@ Use IS NULL rather than = NULL.
 
 SELECT p.patient_id, v.vendor_name, s.site_name, rt.roi_signed_date, rt.status
 FROM recruitment_tracking rt
-JOIN patients p 
-     ON p.patient_id = rt.patient_id
-JOIN vendors v 
-     ON v.vendor_id = p.vendor_id
-JOIN sites s 
-     ON s.site_id = p.site_id
+	JOIN patients p 
+	ON p.patient_id = rt.patient_id
+	JOIN vendors v 
+	ON v.vendor_id = p.vendor_id
+	JOIN sites s 
+	ON s.site_id = p.site_id
 WHERE roi_signed_date IS NULL;
 
 /*
@@ -273,20 +275,20 @@ Conditional aggregation + percentage calculation.
 */
 
 SELECT v.vendor_name,
-       COUNT(p.patient_id) AS total_patients,
-       COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) AS roi_signed,
-       ROUND(
-           COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) * 100.0
+	COUNT(p.patient_id) AS total_patients,
+	COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) AS roi_signed,
+	ROUND(
+		COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) * 100.0
            / COUNT(p.patient_id),
            1
        ) AS roi_signed_percentage
 FROM vendors v
-JOIN patients p 
-     ON p.vendor_id = v.vendor_id
-JOIN recruitment_tracking rt 
-     ON rt.patient_id = p.patient_id
-JOIN record_requests rr 
-     ON rr.patient_id = p.patient_id
+	JOIN patients p 
+    ON p.vendor_id = v.vendor_id
+	JOIN recruitment_tracking rt 
+    ON rt.patient_id = p.patient_id
+	JOIN record_requests rr 
+	ON rr.patient_id = p.patient_id
 GROUP BY v.vendor_name;
  
  /*
@@ -307,11 +309,11 @@ from the same group.
 */
 
 SELECT f.facility_id, f.facility_name,
-       COUNT(CASE WHEN rr.status = 'received' THEN 1 END) AS records_received,
-       COUNT(CASE WHEN rr.status = 'pending' THEN 1 END) AS records_pending
+	COUNT(CASE WHEN rr.status = 'received' THEN 1 END) AS records_received,
+    COUNT(CASE WHEN rr.status = 'pending' THEN 1 END) AS records_pending
 FROM facilities f 
-LEFT JOIN record_requests rr 
-	   ON rr. facility_id = f.facility_id
+	LEFT JOIN record_requests rr 
+	ON rr. facility_id = f.facility_id
 GROUP BY f.facility_id, f.facility_name;
 
 /*
@@ -339,15 +341,14 @@ JOINs can change the grain of the result.
 Patient grain and request grain are not the same thing.
 */
 
-SELECT s.site_id,
-       s.site_name,
-       COUNT(DISTINCT p.patient_id) AS total_patients,
-       COUNT(rr.request_id) AS total_record_requests
+SELECT s.site_id, s.site_name,
+	COUNT(DISTINCT p.patient_id) AS total_patients,
+    COUNT(rr.request_id) AS total_record_requests
 FROM sites s
-LEFT JOIN patients p 
-      ON p.site_id = s.site_id
-LEFT JOIN record_requests rr 
-      ON rr.patient_id = p.patient_id
+	LEFT JOIN patients p 
+	ON p.site_id = s.site_id
+	LEFT JOIN record_requests rr 
+	ON rr.patient_id = p.patient_id
 GROUP BY s.site_id, s.site_name;
 
 /*
@@ -372,15 +373,15 @@ it is not itself an aggregation.
 */
 
 SELECT s.site_id, s.site_name,
-       COUNT(DISTINCT f.facility_id) AS different_facilities,
-       COUNT(rr.request_id) AS record_requests
+	COUNT(DISTINCT f.facility_id) AS different_facilities,
+	COUNT(rr.request_id) AS record_requests
 FROM sites s 
-JOIN patients p 
-       ON p.site_id = s.site_id
-JOIN record_requests rr 
-       ON rr.patient_id = p.patient_id
-LEFT JOIN facilities f 
-       ON f.facility_id = rr.facility_id
+	JOIN patients p 
+	ON p.site_id = s.site_id
+	JOIN record_requests rr 
+	ON rr.patient_id = p.patient_id
+	LEFT JOIN facilities f 
+	ON f.facility_id = rr.facility_id
 GROUP BY s.site_id, s.site_name;
 
 /*
@@ -404,12 +405,12 @@ on an aggregate such as COUNT().
 */
 
 SELECT s.site_name,
-       COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) AS roi_signed_count
+	COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) AS roi_signed_count
 FROM sites s
-JOIN patients p 
-       ON p.site_id = s.site_id
-JOIN recruitment_tracking rt 
-       ON rt.patient_id = p.patient_id
+	JOIN patients p 
+	ON p.site_id = s.site_id
+	JOIN recruitment_tracking rt 
+	ON rt.patient_id = p.patient_id
 GROUP BY s.site_name
 HAVING COUNT(CASE WHEN rt.status = 'roi signed' THEN 1 END) >= 2;
 
@@ -956,8 +957,72 @@ USE clinical_trial_tracking;
 
 /*
 ============================================================
-                 DATASET EXPANDED TO 250
+SQL ANALYST WORKBOOK — PHASE 2
+Relational Reasoning & Business Investigation
+
+MODULE 1 — GRAIN & JOIN MULTIPLICATION LAB
+
+Dataset expanded to 250 patients
 ============================================================
 */
 
+/*
+
+Business Question 1 — Recruitment volume
+
+Operations wants to understand the size of the recruitment pipeline.
+
+Show each vendor and the number of unique patients referred.
+
+Before writing SQL:
+What is the grain of patients?
+What entity are you counting?
+What uniquely identifies it?
+
+*/
+
+SELECT v.vendor_id, v.vendor_name,
+	COUNT(DISTINCT p.patient_id) AS total_referred_patients
+FROM vendors v
+LEFT JOIN patients p
+	ON p.vendor_id = v.vendor_id
+	GROUP BY v.vendor_id, v.vendor_name;
+
+/*
+Business Question 2 — Vendor record-request activity 
+
+Operations wants to know how much medical-record retrieval activity each vendor generated. 
+
+Show each vendor and the number of record requests associated with its patients. 
+
+*/
+
+SELECT v.vendor_id, v.vendor_name, 
+	COUNT(rr.request_id) AS record_requests
+FROM vendors v
+	LEFT JOIN patients p 
+    ON p.vendor_id = v.vendor_id
+    LEFT JOIN record_requests rr
+    ON rr.patient_id = p.patient_id
+GROUP BY v.vendor_id, v.vendor_name;
+
+/*
+Business Question 3 — Patients generating record requests
+
+Operations wants to know how many unique patients from each vendor
+have generated at least one record request.
+
+The report must count each patient only once, even when a patient
+has multiple record requests.
+
+*/
+
+SELECT v.vendor_id, v.vendor_name, 
+	COUNT(DISTINCT rr.patient_id) AS patients_one_record_request
+FROM vendors v
+	LEFT JOIN patients p
+    ON p.vendor_id = v.vendor_id
+    LEFT JOIN record_requests rr
+    ON rr.patient_id = p.patient_id
+GROUP BY v.vendor_id, v.vendor_name;
 
