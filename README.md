@@ -1,5 +1,19 @@
 # A Workflow and Data Analysis of Clinical Trial Recruitment Efficiency 
-> Based on real clinical operations experience managing a two-phase patient tracking system across 10-15 clinical trial sites.
+> Based on real clinical research operations experience managing a two-phase patient recruitment tracking system across 10-15 clinical trial sites.
+
+---
+
+# README Update — Project Evolution & Roadmap
+
+## Project Evolution
+
+The project began as a small PostgreSQL prototype using 10 synthetic patients to test the core two-phase workflow and answer initial operational questions.
+
+It has since been migrated to MySQL and expanded to a **250-patient synthetic dataset** to support more realistic relational analysis and deeper investigation of clinical operations patterns.
+
+The current learning workbook has entered **Phase 2: Relational Reasoning & Business Investigation**, with emphasis on understanding data grain, join behavior, distinct entity counts, and how relational structure affects operational metrics.
+
+The original seven analyses documented below represent the first analytical phase of the project. The expanded dataset and learning workbook are being used to progressively develop more complex operational questions and analysis.
 
 ---
 
@@ -7,13 +21,13 @@
 
 This project was not an academic exercise. It was built from direct clinical operations experience managing a two-phase patient tracking system across 10-15 clinical trial sites. The data model, business questions, and analysis were driven by patterns observed firsthand during trial operations as a Health Information Specialist.
 
-The database structure and analysis were driven by clinical operations expertise, not just technical convention. Domain knowledge shaped every data modeling decision.
+The database structure and analysis were driven by clinical operations insights, not just technical convention. Domain knowledge shaped every data modeling decision.
 
 ---
 
 ## Database Design
 
-The patient pipeline has two distinct phases, each requiring separate tracking:
+The patient recruitment pipeline has two distinct phases, each requiring separate tracking:
 
 - **Phase 1** – Recruitment and signed ROI
 - **Phase 2** – Medical record retrieval
@@ -188,6 +202,25 @@ ORDER BY total_patients_referred DESC;
 - Facility turnaround time and vendor pipeline rates are leading indicators of trial efficiency.
 - A relational database approach replaced manual cross-referencing across multiple Excel tabs, enabling pattern recognition that would not have been visible otherwise.
 - Domain knowledge was essential — clinical operations expertise shaped every data modeling decision, from pipeline phase separation to terminology accuracy around ROI authorization versus trial consent.
+
+---
+
+## Planned Development
+
+The next stages of the project will extend the database from retrospective analysis toward operational monitoring and workflow support.
+
+Planned areas of development include:
+
+* Expanded SQL analysis using the 250-patient dataset
+* Patient, vendor, site, and facility performance analysis
+* Dashboard development and operational visualization
+* Detection of cases requiring follow-up or escalation
+* Automation experiments using SQL results as workflow triggers
+* Exploration of a **query → condition → action** model for operational alerts and task generation
+
+For example, a query identifying patients who are overdue for follow-up could eventually trigger an action rather than requiring a user to manually review the report.
+
+Automation has **not yet been implemented**. It is a planned extension of the operational logic already represented in the database and SQL analysis.
 
 ---
 
