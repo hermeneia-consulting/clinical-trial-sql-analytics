@@ -994,7 +994,6 @@ Business Question 2 — Vendor record-request activity
 Operations wants to know how much medical-record retrieval activity each vendor generated. 
 
 Show each vendor and the number of record requests associated with its patients. 
-
 */
 
 SELECT v.vendor_id, v.vendor_name, 
@@ -1014,7 +1013,6 @@ have generated at least one record request.
 
 The report must count each patient only once, even when a patient
 has multiple record requests.
-
 */
 
 SELECT v.vendor_id, v.vendor_name, 
@@ -1025,4 +1023,73 @@ FROM vendors v
     LEFT JOIN record_requests rr
     ON rr.patient_id = p.patient_id
 GROUP BY v.vendor_id, v.vendor_name;
+
+/*
+Business Question 4 — Vendor conversion accuracy
+
+Leadership wants ROI conversion rates by vendor.
+
+Show:
+vendor
+unique referred patients
+unique patients with signed ROI
+ROI conversion rate
+*/
+
+SELECT v.vendor_id, v.vendor_name,
+	COUNT(DISTINCT p.patient_id) 
+    AS referred_patients,
+	COUNT(DISTINCT CASE WHEN rt.roi_signed_date IS NOT NULL THEN p.patient_id END) 
+    AS patients_with_signed_roi,
+    ROUND(
+    COUNT(DISTINCT CASE WHEN rt.roi_signed_date IS NOT NULL THEN p.patient_id END) * 100.0 / COUNT(DISTINCT p.patient_id),1) 
+    AS roi_conversion_rate
+FROM vendors v
+	LEFT JOIN patients p 
+    ON p.vendor_id = v.vendor_id
+    LEFT JOIN recruitment_tracking rt 
+    ON rt.patient_id = p.patient_id
+GROUP BY v.vendor_id, v.vendor_name;
+
+/*
+Business Question 5 — Facility workload
+
+The records team wants to identify facilities creating the greatest retrieval workload.
+
+Show each facility and:
+total requests actually sent
+total requests received
+total requests still pending
+*/
+
+SELECT f.facility_id, f.facility_name, 
+	COUNT(DISTINCT CASE WHEN rr.roi_sent_date IS NOT NULL THEN rr.request_id END)
+    AS total_requests_sent,
+    COUNT(DISTINCT CASE WHEN rr.records_received_date IS NOT NULL THEN rr.request_id END)
+    AS total_requests_received,
+    COUNT(DISTINCT CASE WHEN rr.roi_sent_date IS NOT NULL AND rr.status = 'pending' THEN rr.request_id END)
+    AS total_pending_requests
+FROM facilities f
+	LEFT JOIN record_requests rr
+    ON f.facility_id = rr.facility_id
+GROUP BY f.facility_id, f.facility_name;
+
+/*
+Business Question 6 — Patient vs. request metrics
+
+A manager asks: “How many patients are waiting for records?”
+
+Another asks:
+“How many record requests are still pending?”
+*/
+
+SELECT
+	COUNT(DISTINCT CASE WHEN roi_sent_date IS NOT NULL AND status = 'pending' THEN patient_id END)
+    AS total_patients_waiting_for_records,
+    COUNT(DISTINCT CASE WHEN roi_sent_date IS NOT NULL AND status = 'pending' THEN request_id END)
+    AS total_pending_record_requests
+    FROM record_requests;
+    
+
+    
 
