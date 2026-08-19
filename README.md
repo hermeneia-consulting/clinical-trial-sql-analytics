@@ -227,6 +227,7 @@ Automation has **not yet been implemented**. It is a planned extension of the op
 ## Tools Used
 - MySQL
 - MySQL Workbench
+- Git
 - GitHub
 
 > **Project note:** This project began as a smaller PostgreSQL prototype and was later migrated to MySQL and expanded into a 250-patient dataset for deeper relational and operational analysis.
